@@ -1,0 +1,84 @@
+// .boxElement {
+//   /* From https://css.glass */
+//   background: rgba(255, 255, 255, 0.2);
+//   border-radius: 16px;
+//   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+//   backdrop-filter: blur(8px);
+//   -webkit-backdrop-filter: blur(8px);
+//   border: 1px solid rgba(0, 0, 0, 0.28);
+// }
+
+// .boxElement {
+//   position: relative;
+//   background: rgba(255, 255, 255, 0.08);
+//   backdrop-filter: blur(40px) saturate(180%);
+//   -webkit-backdrop-filter: blur(20px) saturate(180%);
+//   border-radius: 20px;
+//   border: 1px solid rgba(255, 255, 255, 0.18);
+//   overflow: hidden;
+
+//   // Glass reflection effect
+//   &::before {
+//     content: '';
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     right: 0;
+//     height: 50%;
+//     background: linear-gradient(
+//       180deg,
+//       rgba(255, 255, 255, 0.25) 0%,
+//       rgba(255, 255, 255, 0.05) 50%,
+//       transparent 100%
+//     );
+//     border-radius: 20px 20px 0 0;
+//     pointer-events: none;
+//   }
+
+//   // Subtle border highlight
+//   &::after {
+//     content: '';
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     border-radius: 20px;
+//     padding: 1px;
+//     background: linear-gradient(
+//       135deg,
+//       rgba(255, 255, 255, 0.3) 0%,
+//       rgba(255, 255, 255, 0.1) 50%,
+//       rgba(255, 255, 255, 0.3) 100%
+//     );
+//     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+//     mask-composite: subtract;
+//     -webkit-mask: linear-gradient(#fff 0 0) content-box,
+//       linear-gradient(#fff 0 0);
+//     -webkit-mask-composite: subtract;
+//     pointer-events: none;
+//   }
+// }
+
+.boxElement {
+  // background: rgba(255, 255, 255, 0.1);
+  // backdrop-filter: blur(20px);
+  // -webkit-backdrop-filter: blur(20px);
+  // border-radius: 20px;
+  // border: 1px solid rgba(255, 255, 255, 0.2);
+  // // box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  // padding: 40px;
+
+  // transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 35px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}

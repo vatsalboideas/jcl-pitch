@@ -1,0 +1,37 @@
+.mySwiper {
+  transition: 0.7s ease all;
+  padding: 100px 0;
+  .swiper-slide-prev,
+  .swiper-slide-next {
+    transition: 0.7s ease all;
+    scale: 1;
+  }
+  .swiper-slide-active {
+    transition: 0.7s ease all;
+    scale: 1.5;
+  }
+}
+
+.horizontal-section {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.scroll-container {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 400vw; /* 4 panels = 400vw */
+  height: 100vh;
+}
+
+.panel {
+  flex: 0 0 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  font-weight: bold;
+  color: white;
+}

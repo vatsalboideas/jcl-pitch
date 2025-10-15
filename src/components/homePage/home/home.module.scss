@@ -1,0 +1,81 @@
+.mainElement {
+  // height: 100vw;
+  padding: 320px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  padding-top: 10%;
+
+  // // Desktop aspect ratio (16:9)
+  // @media (min-width: 1024px) {
+  //   aspect-ratio: 16/9;
+  //   height: auto;
+  // }
+
+  // // Mobile aspect ratio (9:16)
+  // @media (max-width: 1023px) {
+  //   aspect-ratio: 9/16;
+  //   height: auto;
+  // }
+
+  &.fadeIn {
+    animation: fadeInUp 1.2s ease-out forwards;
+  }
+
+  &.fadeOut {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .bgImage {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    z-index: -5;
+    translate: 0 -80%;
+    width: 100%;
+    height: auto;
+    image {
+      object-position: contain;
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .bgImageBox {
+    // background: rgba($color: #fff, $alpha: 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: relative;
+    .leftImage,
+    .rightImage {
+      position: absolute;
+    }
+    .leftImage {
+      left: -20%;
+      bottom: 0%;
+      height: 40px;
+      width: auto;
+      z-index: 1;
+      rotate: 16deg;
+    }
+    .rightImage {
+      right: -30%;
+      bottom: -15%;
+      height: 50px;
+      z-index: 3;
+      width: auto;
+      rotate: -12deg;
+    }
+  }
+}
