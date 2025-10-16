@@ -17,6 +17,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { useGSAP } from '@gsap/react';
 import Link from 'next/link';
+import { projects } from '@/src/data/projects';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother, useGSAP);
 
@@ -257,72 +258,37 @@ const Things = (props: Props) => {
         <div className={styles.horizontalSection} ref={sectionRef}>
           <div className={styles.stickyWrapper}>
             <div className={styles.horizontalScroll} ref={horizontalRef}>
-              <Link href={'/nmacc'}>
-                <div className={`${styles.panel} hzPanel ${styles.isCentered}`}>
-                  <Image
-                    src={'/card1.png'}
-                    alt="cardImage"
-                    width={1284}
-                    height={854}
-                    className={styles.image}
-                  />
-                </div>
-              </Link>
-              <Link href={'/nmacc'}>
-                <div className={`${styles.panel} hzPanel`}>
-                  <Image
-                    src={'/card2.png'}
-                    alt="cardImage"
-                    width={1284}
-                    height={854}
-                    className={styles.image}
-                  />
-                </div>
-              </Link>
-              <Link href={'/nmacc'}>
-                <div className={`${styles.panel} hzPanel`}>
-                  <Image
-                    src={'/card3.png'}
-                    alt="cardImage"
-                    width={1284}
-                    height={854}
-                    className={styles.image}
-                  />
-                </div>
-              </Link>
-              <Link href={'/nmacc'}>
-                <div className={`${styles.panel} hzPanel`}>
-                  <Image
-                    src={'/card1.png'}
-                    alt="cardImage"
-                    width={1284}
-                    height={854}
-                    className={styles.image}
-                  />
-                </div>
-              </Link>
-              <Link href={'/nmacc'}>
-                <div className={`${styles.panel} hzPanel`}>
-                  <Image
-                    src={'/card2.png'}
-                    alt="cardImage"
-                    width={1284}
-                    height={854}
-                    className={styles.image}
-                  />
-                </div>
-              </Link>
-              <Link href={'/nmacc'}>
-                <div className={`${styles.panel} hzPanel`}>
-                  <Image
-                    src={'/card3.png'}
-                    alt="cardImage"
-                    width={1284}
-                    height={854}
-                    className={styles.image}
-                  />
-                </div>
-              </Link>
+              {projects.map((project, index) => (
+                <Link key={project.id} href={`/${project.id}`}>
+                  <div
+                    className={`${styles.panel} hzPanel ${
+                      index === 0 ? styles.isCentered : ''
+                    }`}
+                  >
+                    <Image
+                      src={project.scrollCard}
+                      alt={`${project.title} card`}
+                      width={1284}
+                      height={854}
+                      className={styles.image}
+                    />
+                  </div>
+                </Link>
+              ))}
+              {/* Duplicate projects for seamless scrolling */}
+              {projects.map((project, index) => (
+                <Link key={`${project.id}-dup`} href={`/${project.id}`}>
+                  <div className={`${styles.panel} hzPanel`}>
+                    <Image
+                      src={project.scrollCard}
+                      alt={`${project.title} card`}
+                      width={1284}
+                      height={854}
+                      className={styles.image}
+                    />
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
         </div>

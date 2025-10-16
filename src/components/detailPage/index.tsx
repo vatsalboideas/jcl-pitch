@@ -5,10 +5,13 @@ import styles from './detailPage.module.scss';
 import Image from 'next/image';
 import GlassElement from '@/src/ui/glassElement';
 import Link from 'next/link';
+import { ProjectData } from '@/src/types/project';
 
-type Props = {};
+type Props = {
+  project: ProjectData;
+};
 
-const DetailPage = (props: Props) => {
+const DetailPage = ({ project }: Props) => {
   const [scrollY, setScrollY] = useState(0);
 
   const [showButton, setShowButton] = useState(false);
@@ -70,6 +73,9 @@ const DetailPage = (props: Props) => {
           className={styles.topGradient}
           style={{
             transform: 'none !important',
+            background: project.hero.gradientColors
+              ? project.hero.gradientColors.top
+              : 'transparent',
           }}
         ></div>
         <div
@@ -78,8 +84,8 @@ const DetailPage = (props: Props) => {
         // }}
         >
           <Image
-            src={'/namcc.png'}
-            alt="namcc-first-frame"
+            src={project.hero.image}
+            alt={`${project.title}-hero-image`}
             width={3840}
             height={2468}
             className={styles.heroImage}
@@ -89,12 +95,15 @@ const DetailPage = (props: Props) => {
           className={styles.bottomGradient}
           style={{
             transform: 'none !important',
+            background: project.hero.gradientColors
+              ? project.hero.gradientColors.bottom
+              : 'transparent',
           }}
         ></div>
       </div>
       <div className={styles.bodyTextData}>
         <Image
-          src={'/details1.png'}
+          src={project.description.backgroundImage}
           alt="bg"
           width={1864}
           height={3326}
@@ -113,7 +122,7 @@ const DetailPage = (props: Props) => {
                   transform: `translateY(-${scrollY * 0.04}px)`,
                 }}
               >
-                DESCRIPTION
+                {project.description.title}
               </Typography>
               <GlassElement
                 style={{
@@ -127,13 +136,15 @@ const DetailPage = (props: Props) => {
                   paddingY: 5,
                 }}
               >
-                Lorem ipsum dolor sit amet consectetur. Ultrices tincidunt nibh
-                varius at. Purus vulputate et pellentesque at a odio tempor ut.
-                Sed vestibulum tortor gravida consequat. Neque tincidunt tempus
-                sed congue posuere mattis.
+                {project.description.content}
               </GlassElement>
             </Grid>
-            <Grid container justifyContent={'flex-end'} columnSpacing={3}>
+            <Grid
+              container
+              alignItems={'center'}
+              justifyContent={'flex-end'}
+              columnSpacing={3}
+            >
               <Grid
                 size={4}
                 container
@@ -142,48 +153,23 @@ const DetailPage = (props: Props) => {
                 rowGap={2}
                 sx={{ marginTop: 4 }}
               >
-                <Grid
-                  size={12}
-                  container
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  <Image
-                    src={'/making1.png'}
-                    alt="makingimage 1 "
-                    width={398}
-                    height={224}
-                    className={styles.makingImage}
-                  />
-                </Grid>
-                <Grid
-                  container
-                  size={12}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  <Image
-                    src={'/making2.png'}
-                    alt="makingimage 1 "
-                    width={398}
-                    height={224}
-                    className={styles.makingImage}
-                  />
-                </Grid>
-                <Grid
-                  container
-                  size={12}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  <Image
-                    src={'/making3.png'}
-                    alt="makingimage 1 "
-                    width={398}
-                    height={224}
-                    className={styles.makingImage}
-                  />
-                </Grid>
+                {project.making.images.map((image, index) => (
+                  <Grid
+                    key={index}
+                    size={12}
+                    container
+                    alignItems={'center'}
+                    justifyContent={'center'}
+                  >
+                    <Image
+                      src={image}
+                      alt={`making image ${index + 1}`}
+                      width={398}
+                      height={224}
+                      className={styles.makingImage}
+                    />
+                  </Grid>
+                ))}
               </Grid>
               <Grid
                 size={8}
@@ -204,7 +190,7 @@ const DetailPage = (props: Props) => {
                       transform: `translateY(-${scrollY * 0.04}px)`,
                     }}
                   >
-                    MAKING
+                    {project.making.title}
                   </Typography>
                   <GlassElement
                     style={{
@@ -218,15 +204,7 @@ const DetailPage = (props: Props) => {
                       paddingY: 8,
                     }}
                   >
-                    For the NMACC India Weekend in New York City, we designed
-                    and developed a dynamic website that evolved from the
-                    announcement phase to the final show day. Our process began
-                    with analysing each act and curating the content hierarchy
-                    to highlight what mattered most to visitors. We prioritised
-                    user flow and clarity, structured the data to give equal
-                    importance to every performance, and continuously refined
-                    the interface to keep the experience fresh and intuitive —
-                    ensuring the event reached full bookings seamlessly.
+                    {project.making.content}
                   </GlassElement>
                 </Grid>
               </Grid>
@@ -236,7 +214,7 @@ const DetailPage = (props: Props) => {
       </div>
       <div className={styles.mokup}>
         <Image
-          src={'/mokup1.png'}
+          src={project.mockup.backgroundImage1}
           alt="mokupbg"
           width={3147}
           height={4140}
@@ -253,7 +231,7 @@ const DetailPage = (props: Props) => {
               transform: `translateY(-${scrollY * 0.04}px)`,
             }}
           >
-            MOCKUP
+            {project.mockup.title}
           </Typography>
           <GlassElement
             sx={{ marginTop: -6 }}
@@ -263,15 +241,15 @@ const DetailPage = (props: Props) => {
           >
             <div className={styles.glassElement}>
               <Image
-                src={'/nmacc-mokup.png'}
-                alt="nmacc-mokup"
+                src={project.mockup.mockupImage}
+                alt={`${project.title}-mockup`}
                 height={2666}
                 width={4000}
                 className={styles.mockupImage}
               />
               <Image
-                src={'/nmacc-body.png'}
-                alt="nmacc-body"
+                src={project.mockup.bodyImage}
+                alt={`${project.title}-body`}
                 height={4424}
                 width={2280}
                 className={styles.bodyImage}
@@ -280,7 +258,7 @@ const DetailPage = (props: Props) => {
           </GlassElement>
         </Container>
         <Image
-          src={'/mokup2.png'}
+          src={project.mockup.backgroundImage2}
           alt="mokupbg"
           width={3840}
           height={5682}
