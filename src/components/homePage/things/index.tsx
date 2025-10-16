@@ -22,73 +22,127 @@ gsap.registerPlugin(ScrollTrigger, ScrollSmoother, useGSAP);
 type Props = {};
 
 const Things = (props: Props) => {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const horizontalRef = useRef(null);
+  const sectionRef = useRef(null);
+  const scrollHintRef = useRef(null);
+  // Removed fade-in state
   const [scrollY, setScrollY] = useState(0);
   const aboutRef = useRef<HTMLDivElement>(null);
-  const cardsContainerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const [opening, setOpening] = useState(false);
-  const [overlayVars, setOverlayVars] = useState<React.CSSProperties>({});
-  const sectionRef = useRef(null);
-  const triggerRef = useRef(null);
+
+  // useEffect(() => {
+  //   gsap.registerPlugin(ScrollTrigger);
+
+  //   const horizontal = horizontalRef.current;
+  //   const sections = gsap.utils.toArray('.hzPanel');
+
+  //   // Sum up all offset widths
+  //   const totalWidth = sections.reduce(
+  //     (acc, section) => acc + section && section.offsetWidth,
+  //     0,
+  //   );
+
+  //   console.log(sections, 'section', totalWidth, 'totalWidth');
+
+  //   // Create the horizontal scroll animation
+  //   const scrollTween = gsap.to(horizontal, {
+  //     x: () => -(totalWidth - window.innerWidth),
+  //     ease: 'none',
+  //     scrollTrigger: {
+  //       trigger: sectionRef.current,
+  //       start: 'top top',
+  //       end: () => `+=${totalWidth}`,
+  //       scrub: 1,
+  //       pin: true,
+  //       anticipatePin: 1,
+  //       invalidateOnRefresh: true,
+  //       markers: true,
+  //       onUpdate: (self) => {
+  //         // Ensure smooth start
+  //         if (self.progress === 0) {
+  //           gsap.set(horizontal, { x: 0 });
+  //         }
+  //       },
+  //     },
+  //   });
+
+  //   // Fade out scroll hint
+  //   gsap.to(scrollHintRef.current, {
+  //     opacity: 0,
+  //     scrollTrigger: {
+  //       start: 'top top',
+  //       end: '+=300',
+  //       scrub: true,
+  //     },
+  //   });
+
+  //   // Refresh ScrollTrigger after a brief delay to ensure proper calculation
+  //   const timer = setTimeout(() => {
+  //     ScrollTrigger.refresh();
+  //   }, 100);
+
+  //   return () => {
+  //     clearTimeout(timer);
+  //     ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+  //   };
+  // }, []);
 
   useEffect(() => {
-    // Fade in animation on load
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 300);
+    gsap.registerPlugin(ScrollTrigger);
+
+    const horizontal = horizontalRef.current;
+    const sections = gsap.utils.toArray<HTMLElement>('.hzPanel');
+
+    // ✅ Properly sum the offsetWidths of all sections
+    const totalWidth = sections.reduce(
+      (acc, section) => acc + section.offsetWidth,
+      0,
+    );
+
+    console.log('Sections:', sections, 'Total Width:', totalWidth);
+
+    // ✅ Create the horizontal scroll animation
+    const scrollTween = gsap.to(horizontal, {
+      x: () => -totalWidth,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: `top top+=${sections[0].offsetHeight}`,
+        end: () => `+=${totalWidth}`,
+        scrub: 1,
+        pin: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        markers: true,
+        onUpdate: (self) => {
+          if (self.progress === 0) gsap.set(horizontal, { x: 0 });
+        },
+      },
+    });
+
+    // ✅ Fade out scroll hint (optional)
+    if (scrollHintRef.current) {
+      gsap.to(scrollHintRef.current, {
+        opacity: 0,
+        scrollTrigger: {
+          start: 'top top',
+          end: '+=300',
+          scrub: true,
+        },
+      });
+    }
+
+    // ✅ Refresh ScrollTrigger after layout settles
+    const timer = setTimeout(() => ScrollTrigger.refresh(), 200);
 
     return () => {
       clearTimeout(timer);
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
   }, []);
-
-  useEffect(() => {
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          setScrollY(window.scrollY);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const handleCardClick = (e: MouseEvent<HTMLDivElement>) => {
-    if (opening) return;
-    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-
-    setOverlayVars({
-      // CSS variables consumed by .blob
-      ['--x' as any]: `${x}px`,
-      ['--y' as any]: `${y}px`,
-      ['--w' as any]: `${Math.max(120, rect.width)}px`,
-      ['--h' as any]: `${Math.max(80, rect.height)}px`,
-    });
-    setOpening(true);
-
-    window.setTimeout(() => {
-      router.push('/nmacc');
-    }, 650);
-  };
 
   return (
     <>
-      <Box
-        component={'section'}
-        className={`${styles.section} ${
-          isLoaded ? styles.fadeIn : styles.fadeOut
-        }`}
-        ref={aboutRef}
-      >
+      <Box component={'section'} className={`${styles.section}`} ref={aboutRef}>
         <Image
           src={'/things.png'}
           alt="about bg"
@@ -132,12 +186,65 @@ const Things = (props: Props) => {
           </Grid>
         </Container>
 
-        <div
-          className={styles.openOverlay}
-          data-animate={opening ? 'true' : 'false'}
-          aria-hidden
-        >
-          <div className="blob" style={overlayVars} />
+        <div className={styles.horizontalSection} ref={sectionRef}>
+          <div className={styles.stickyWrapper}>
+            <div className={styles.horizontalScroll} ref={horizontalRef}>
+              <div className={`${styles.panel} hzPanel`}>
+                <Image
+                  src={'/card1.png'}
+                  alt="cardImage"
+                  width={1284}
+                  height={854}
+                  className={styles.image}
+                />
+              </div>
+              <div className={`${styles.panel} hzPanel`}>
+                <Image
+                  src={'/card2.png'}
+                  alt="cardImage"
+                  width={1284}
+                  height={854}
+                  className={styles.image}
+                />
+              </div>
+              <div className={`${styles.panel} hzPanel`}>
+                <Image
+                  src={'/card3.png'}
+                  alt="cardImage"
+                  width={1284}
+                  height={854}
+                  className={styles.image}
+                />
+              </div>
+              <div className={`${styles.panel} hzPanel`}>
+                <Image
+                  src={'/card1.png'}
+                  alt="cardImage"
+                  width={1284}
+                  height={854}
+                  className={styles.image}
+                />
+              </div>
+              <div className={`${styles.panel} hzPanel`}>
+                <Image
+                  src={'/card2.png'}
+                  alt="cardImage"
+                  width={1284}
+                  height={854}
+                  className={styles.image}
+                />
+              </div>
+              <div className={`${styles.panel} hzPanel`}>
+                <Image
+                  src={'/card3.png'}
+                  alt="cardImage"
+                  width={1284}
+                  height={854}
+                  className={styles.image}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </Box>
     </>
