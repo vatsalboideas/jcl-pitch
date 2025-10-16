@@ -16,6 +16,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 // ScrollSmoother requires ScrollTrigger
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { useGSAP } from '@gsap/react';
+import Link from 'next/link';
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother, useGSAP);
 
@@ -28,28 +29,29 @@ const Things = (props: Props) => {
   // Removed fade-in state
   const [scrollY, setScrollY] = useState(0);
   const aboutRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
 
   // useEffect(() => {
   //   gsap.registerPlugin(ScrollTrigger);
 
   //   const horizontal = horizontalRef.current;
-  //   const sections = gsap.utils.toArray('.hzPanel');
+  //   const sections = gsap.utils.toArray<HTMLElement>('.hzPanel');
 
-  //   // Sum up all offset widths
+  //   // ✅ Properly sum the offsetWidths of all sections
   //   const totalWidth = sections.reduce(
-  //     (acc, section) => acc + section && section.offsetWidth,
+  //     (acc, section) => acc + section.offsetWidth,
   //     0,
   //   );
 
-  //   console.log(sections, 'section', totalWidth, 'totalWidth');
+  //   console.log('Sections:', sections, 'Total Width:', totalWidth);
 
-  //   // Create the horizontal scroll animation
+  //   // ✅ Create the horizontal scroll animation
   //   const scrollTween = gsap.to(horizontal, {
-  //     x: () => -(totalWidth - window.innerWidth),
+  //     x: () => -totalWidth,
   //     ease: 'none',
   //     scrollTrigger: {
   //       trigger: sectionRef.current,
-  //       start: 'top top',
+  //       start: `top top+=${sections[0].offsetHeight}`,
   //       end: () => `+=${totalWidth}`,
   //       scrub: 1,
   //       pin: true,
@@ -57,28 +59,25 @@ const Things = (props: Props) => {
   //       invalidateOnRefresh: true,
   //       markers: true,
   //       onUpdate: (self) => {
-  //         // Ensure smooth start
-  //         if (self.progress === 0) {
-  //           gsap.set(horizontal, { x: 0 });
-  //         }
+  //         if (self.progress === 0) gsap.set(horizontal, { x: 0 });
   //       },
   //     },
   //   });
 
-  //   // Fade out scroll hint
-  //   gsap.to(scrollHintRef.current, {
-  //     opacity: 0,
-  //     scrollTrigger: {
-  //       start: 'top top',
-  //       end: '+=300',
-  //       scrub: true,
-  //     },
-  //   });
+  //   // ✅ Fade out scroll hint (optional)
+  //   if (scrollHintRef.current) {
+  //     gsap.to(scrollHintRef.current, {
+  //       opacity: 0,
+  //       scrollTrigger: {
+  //         start: 'top top',
+  //         end: '+=300',
+  //         scrub: true,
+  //       },
+  //     });
+  //   }
 
-  //   // Refresh ScrollTrigger after a brief delay to ensure proper calculation
-  //   const timer = setTimeout(() => {
-  //     ScrollTrigger.refresh();
-  //   }, 100);
+  //   // ✅ Refresh ScrollTrigger after layout settles
+  //   const timer = setTimeout(() => ScrollTrigger.refresh(), 200);
 
   //   return () => {
   //     clearTimeout(timer);
@@ -92,13 +91,12 @@ const Things = (props: Props) => {
     const horizontal = horizontalRef.current;
     const sections = gsap.utils.toArray<HTMLElement>('.hzPanel');
 
-    // ✅ Properly sum the offsetWidths of all sections
     const totalWidth = sections.reduce(
       (acc, section) => acc + section.offsetWidth,
       0,
     );
 
-    console.log('Sections:', sections, 'Total Width:', totalWidth);
+    // console.log('Sections:', sections, 'Total Width:', totalWidth);
 
     // ✅ Create the horizontal scroll animation
     const scrollTween = gsap.to(horizontal, {
@@ -112,10 +110,57 @@ const Things = (props: Props) => {
         pin: true,
         anticipatePin: 1,
         invalidateOnRefresh: true,
-        markers: true,
+        // markers: true,
         onUpdate: (self) => {
           if (self.progress === 0) gsap.set(horizontal, { x: 0 });
+
+          // ✅ Calculate which card is in the center
+          const viewportCenter = window.innerWidth / 2;
+          let cumulativeX = 0;
+
+          sections.forEach((section) => {
+            const sectionWidth = section.offsetWidth;
+            const sectionStart = cumulativeX;
+            const sectionEnd = cumulativeX + sectionWidth;
+            const sectionCenter = sectionStart + sectionWidth / 1.1;
+
+            // Calculate the current x position based on scroll progress
+            const currentX = -self.progress * totalWidth;
+
+            // Check if section center is near viewport center
+            const sectionCenterOnScreen = sectionCenter + currentX;
+            const distanceFromCenter = Math.abs(
+              sectionCenterOnScreen - viewportCenter,
+            );
+
+            // Add/remove class based on proximity to center (adjust threshold as needed)
+            if (distanceFromCenter < sectionWidth / 2) {
+              section.classList.add(styles.isCentered);
+            } else {
+              section.classList.remove(styles.isCentered);
+            }
+
+            cumulativeX += sectionWidth;
+          });
         },
+      },
+    });
+
+    // Pin the heading/text container to the top while horizontal section scrolls
+    const PIN_OFFSET = 0; // px from top while pinned
+    ScrollTrigger.create({
+      trigger: aboutRef.current,
+      start: 'top-=100px top',
+      end: () => `+=${totalWidth}`,
+      pin: textRef.current as HTMLElement | null,
+      pinSpacing: false,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
+      // markers: true,
+      onToggle: (self) => {
+        if (textRef.current) {
+          gsap.set(textRef.current, { y: self.isActive ? PIN_OFFSET : 0 });
+        }
       },
     });
 
@@ -140,6 +185,23 @@ const Things = (props: Props) => {
     };
   }, []);
 
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrollY(window.scrollY);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <>
       <Box component={'section'} className={`${styles.section}`} ref={aboutRef}>
@@ -153,7 +215,7 @@ const Things = (props: Props) => {
             transform: `translateY(${scrollY * 0.1}px)`,
           }}
         />
-        <Container>
+        <Container className={styles.textBox} ref={textRef}>
           <Grid container>
             <Grid
               alignItems={'center'}
@@ -167,6 +229,9 @@ const Things = (props: Props) => {
                   fontSize: 200,
                   lineHeight: 0.8,
                 }}
+                style={{
+                  transform: `translateY(-${scrollY * 0.01}px)`,
+                }}
               >
                 THINGS WE'VE <br />
                 CRAFTED
@@ -175,7 +240,10 @@ const Things = (props: Props) => {
                 sx={{
                   paddingX: 10,
                   paddingY: 5,
-                  // marginTop: -12,
+                  marginTop: -4,
+                }}
+                style={{
+                  transform: `translateY(-${scrollY * 0.02}px)`,
                 }}
               >
                 A collection of projects that blend strategy, storytelling, and
@@ -189,60 +257,72 @@ const Things = (props: Props) => {
         <div className={styles.horizontalSection} ref={sectionRef}>
           <div className={styles.stickyWrapper}>
             <div className={styles.horizontalScroll} ref={horizontalRef}>
-              <div className={`${styles.panel} hzPanel`}>
-                <Image
-                  src={'/card1.png'}
-                  alt="cardImage"
-                  width={1284}
-                  height={854}
-                  className={styles.image}
-                />
-              </div>
-              <div className={`${styles.panel} hzPanel`}>
-                <Image
-                  src={'/card2.png'}
-                  alt="cardImage"
-                  width={1284}
-                  height={854}
-                  className={styles.image}
-                />
-              </div>
-              <div className={`${styles.panel} hzPanel`}>
-                <Image
-                  src={'/card3.png'}
-                  alt="cardImage"
-                  width={1284}
-                  height={854}
-                  className={styles.image}
-                />
-              </div>
-              <div className={`${styles.panel} hzPanel`}>
-                <Image
-                  src={'/card1.png'}
-                  alt="cardImage"
-                  width={1284}
-                  height={854}
-                  className={styles.image}
-                />
-              </div>
-              <div className={`${styles.panel} hzPanel`}>
-                <Image
-                  src={'/card2.png'}
-                  alt="cardImage"
-                  width={1284}
-                  height={854}
-                  className={styles.image}
-                />
-              </div>
-              <div className={`${styles.panel} hzPanel`}>
-                <Image
-                  src={'/card3.png'}
-                  alt="cardImage"
-                  width={1284}
-                  height={854}
-                  className={styles.image}
-                />
-              </div>
+              <Link href={'/nmacc'}>
+                <div className={`${styles.panel} hzPanel ${styles.isCentered}`}>
+                  <Image
+                    src={'/card1.png'}
+                    alt="cardImage"
+                    width={1284}
+                    height={854}
+                    className={styles.image}
+                  />
+                </div>
+              </Link>
+              <Link href={'/nmacc'}>
+                <div className={`${styles.panel} hzPanel`}>
+                  <Image
+                    src={'/card2.png'}
+                    alt="cardImage"
+                    width={1284}
+                    height={854}
+                    className={styles.image}
+                  />
+                </div>
+              </Link>
+              <Link href={'/nmacc'}>
+                <div className={`${styles.panel} hzPanel`}>
+                  <Image
+                    src={'/card3.png'}
+                    alt="cardImage"
+                    width={1284}
+                    height={854}
+                    className={styles.image}
+                  />
+                </div>
+              </Link>
+              <Link href={'/nmacc'}>
+                <div className={`${styles.panel} hzPanel`}>
+                  <Image
+                    src={'/card1.png'}
+                    alt="cardImage"
+                    width={1284}
+                    height={854}
+                    className={styles.image}
+                  />
+                </div>
+              </Link>
+              <Link href={'/nmacc'}>
+                <div className={`${styles.panel} hzPanel`}>
+                  <Image
+                    src={'/card2.png'}
+                    alt="cardImage"
+                    width={1284}
+                    height={854}
+                    className={styles.image}
+                  />
+                </div>
+              </Link>
+              <Link href={'/nmacc'}>
+                <div className={`${styles.panel} hzPanel`}>
+                  <Image
+                    src={'/card3.png'}
+                    alt="cardImage"
+                    width={1284}
+                    height={854}
+                    className={styles.image}
+                  />
+                </div>
+              </Link>
             </div>
           </div>
         </div>

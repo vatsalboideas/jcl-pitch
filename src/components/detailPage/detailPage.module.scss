@@ -87,17 +87,18 @@
     .bgimage2 {
       height: auto;
       position: absolute;
-      z-index: -2;
     }
     .bgimage1 {
       width: 100%;
       top: -30%;
       left: 0;
+      z-index: -2;
     }
     .bgimage2 {
       width: 80%;
       bottom: 0;
       right: 0;
+      z-index: -3;
     }
   }
   .backButton {

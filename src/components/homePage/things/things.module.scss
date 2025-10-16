@@ -1,13 +1,18 @@
 .section {
+  margin-top: 200px;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  padding: 240px 0 50px; // more breathing room
+  // padding: 240px 0 50px; // more breathing room
   // margin-bottom: 160px; // extra gap at bottom of page
   // border: 1px solid green;
   flex-direction: column;
+
+  .textBox {
+    position: relative; // GSAP handles pinning
+  }
 
   &::before {
     position: absolute;
@@ -107,8 +112,8 @@
   }
 
   .horizontalSection {
-    margin-top: 150px;
-    // height: 100vh;
+    margin-top: 50px;
+    height: 300vh;
     overflow: hidden;
     position: relative;
   }
@@ -116,14 +121,16 @@
     position: sticky;
     top: 0;
     // height: 100vh;
-    overflow: hidden;
+    // overflow: hidden;
   }
   .horizontalScroll {
     display: flex;
     // height: 100vh;
     width: fit-content;
+    padding: 100px 0 0 50px;
   }
   .panel {
+    margin: 0 40px;
     width: 50vw;
     height: 40vh;
     display: flex;
@@ -137,5 +144,10 @@
       width: auto;
       height: 100%;
     }
+    transition: 0.5s all ease;
+  }
+  .isCentered {
+    // border: 1px solid red;
+    scale: 1.3;
   }
 }

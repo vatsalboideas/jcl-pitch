@@ -60,7 +60,7 @@ const About = (props: Props) => {
             alt="about bg"
             width={1920}
             height={1080}
-            className={styles.aboutBg}
+            className={`${styles.aboutBg} fade-in-up`}
           />
         </div>
         <Container>
@@ -77,7 +77,7 @@ const About = (props: Props) => {
                   fontSize: 200,
                 }}
                 style={{
-                  transform: `translateY(${scrollY * 0.04}px)`,
+                  transform: `translateY(-${scrollY * 0.01}px)`,
                 }}
               >
                 ABOUT
@@ -89,7 +89,7 @@ const About = (props: Props) => {
                   marginTop: -12,
                 }}
                 style={{
-                  transform: `translateY(${scrollY * 0.06}px)`,
+                  transform: `translateY(-${scrollY * 0.04}px)`,
                 }}
               >
                 Lorem ipsum dolor sit amet consectetur. Ultrices tincidunt nibh

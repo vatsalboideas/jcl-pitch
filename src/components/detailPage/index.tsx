@@ -106,10 +106,19 @@ const DetailPage = (props: Props) => {
         <Container>
           <Grid container rowGap={20}>
             <Grid container size={9}>
-              <Typography variant="h2" sx={{ fontSize: 120, marginLeft: 3 }}>
+              <Typography
+                variant="h2"
+                sx={{ fontSize: 120, marginLeft: 3 }}
+                style={{
+                  transform: `translateY(-${scrollY * 0.04}px)`,
+                }}
+              >
                 DESCRIPTION
               </Typography>
               <GlassElement
+                style={{
+                  transform: `translateY(-${scrollY * 0.05}px)`,
+                }}
                 sx={{
                   marginTop: -7,
                   zIndex: 2,
@@ -191,10 +200,16 @@ const DetailPage = (props: Props) => {
                   <Typography
                     variant="h2"
                     sx={{ fontSize: 120, marginRight: 5 }}
+                    style={{
+                      transform: `translateY(-${scrollY * 0.04}px)`,
+                    }}
                   >
                     MAKING
                   </Typography>
                   <GlassElement
+                    style={{
+                      transform: `translateY(-${scrollY * 0.05}px)`,
+                    }}
                     sx={{
                       marginTop: -7,
                       zIndex: 2,
@@ -227,14 +242,25 @@ const DetailPage = (props: Props) => {
           height={4140}
           className={styles.bgimage1}
           style={{
-            transform: `translateY(${scrollY * 0.05}px)`,
+            transform: `translateY(${scrollY * 0.04}px)`,
           }}
         />
         <Container>
-          <Typography variant="h2" sx={{ fontSize: 120 }}>
+          <Typography
+            variant="h2"
+            sx={{ fontSize: 120 }}
+            style={{
+              transform: `translateY(-${scrollY * 0.04}px)`,
+            }}
+          >
             MOCKUP
           </Typography>
-          <GlassElement sx={{ marginTop: -6 }}>
+          <GlassElement
+            sx={{ marginTop: -6 }}
+            style={{
+              transform: `translateY(-${scrollY * 0.05}px)`,
+            }}
+          >
             <div className={styles.glassElement}>
               <Image
                 src={'/nmacc-mokup.png'}

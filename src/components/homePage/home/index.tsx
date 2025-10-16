@@ -59,7 +59,7 @@ const Home = (props: Props) => {
           alt="homebg"
           width={1920}
           height={1080}
-          className={styles.bgImage}
+          className={`${styles.bgImage} fade-in-up`}
           style={{
             transform: `translateY(${scrollY * 0.15}px)`,
           }}
